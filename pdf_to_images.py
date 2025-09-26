@@ -44,7 +44,7 @@ def convert_pdf_to_temp_images(pdf_path, temp_dir, dpi=300):
 def process_single_pdf():
     """
     Processes one PDF at a time, saves images to a temporary directory, and allows the user
-    to select individual pages to move to the processed_imgs/ or processed_imgs_gs/ folder.
+    to select whether to process the images in grayscale or color.
     """
     # Get a list of all PDF files in the input directory
     pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")]
@@ -72,6 +72,15 @@ def process_single_pdf():
     pdf_path = os.path.join(PDF_DIR, selected_pdf)
     print(f"Selected PDF: {selected_pdf}")
     
+    # Ask the user whether to process in grayscale or color
+    while True:
+        grayscale_choice = input("Do you want to process the images in grayscale? (yes/no): ").strip().lower()
+        if grayscale_choice in ["yes", "no"]:
+            grayscale = grayscale_choice == "yes"
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+    
     # Create a temporary directory for processing
     with tempfile.TemporaryDirectory() as temp_dir:
         print(f"Temporary directory created: {temp_dir}")
@@ -85,49 +94,40 @@ def process_single_pdf():
         for idx, image_file in enumerate(temp_images, start=1):
             print(f"{idx}. {image_file}")
         
-        # Allow the user to select pages to move to the processed_imgs/ or processed_imgs_gs/ folder
-        print("\nEnter the numbers of the pages to move to the processed_imgs/ folder (comma-separated):")
-        try:
-            selected_color_pages = input("Color Pages: ").split(",")
-            selected_color_pages = [int(page.strip()) for page in selected_color_pages if page.strip()]
-        except ValueError:
-            print("Invalid input for color pages. Skipping.")
-            selected_color_pages = []
+        # Ask the user which pages to move based on grayscale choice
+        if grayscale:
+            print("\nEnter the numbers of the pages to move to the processed_imgs_gs/ folder (comma-separated):")
+            output_dir = OUTPUT_DIR_GS
+        else:
+            print("\nEnter the numbers of the pages to move to the processed_imgs/ folder (comma-separated):")
+            output_dir = OUTPUT_DIR_COLOR
         
-        print("\nEnter the numbers of the pages to move to the processed_imgs_gs/ folder (comma-separated):")
         try:
-            selected_grayscale_pages = input("Grayscale Pages: ").split(",")
-            selected_grayscale_pages = [int(page.strip()) for page in selected_grayscale_pages if page.strip()]
+            selected_pages = input("Pages: ").split(",")
+            selected_pages = [int(page.strip()) for page in selected_pages if page.strip()]
         except ValueError:
-            print("Invalid input for grayscale pages. Skipping.")
-            selected_grayscale_pages = []
+            print("Invalid input. Exiting.")
+            return
         
-        # Move the selected pages to the appropriate folders
-        for page_num in selected_color_pages:
+        # Move the selected pages to the appropriate folder
+        for page_num in selected_pages:
             if page_num < 1 or page_num > len(temp_images):
                 print(f"Invalid page number: {page_num}. Skipping.")
                 continue
             
             image_file = temp_images[page_num - 1]
             src_path = os.path.join(temp_dir, image_file)
-            dest_path = os.path.join(OUTPUT_DIR_COLOR, image_file)
-            shutil.move(src_path, dest_path)
-            print(f"Moved to Color Folder: {image_file}")
-        
-        for page_num in selected_grayscale_pages:
-            if page_num < 1 or page_num > len(temp_images):
-                print(f"Invalid page number: {page_num}. Skipping.")
-                continue
+            dest_path = os.path.join(output_dir, image_file)
             
-            image_file = temp_images[page_num - 1]
-            src_path = os.path.join(temp_dir, image_file)
-            dest_path = os.path.join(OUTPUT_DIR_GS, image_file)
-            
-            # Convert to grayscale before moving
-            with Image.open(src_path) as img:
-                grayscale_img = img.convert("L")
-                grayscale_img.save(dest_path)
-            print(f"Moved to Grayscale Folder: {image_file}")
+            if grayscale:
+                # Convert to grayscale before moving
+                with Image.open(src_path) as img:
+                    grayscale_img = img.convert("L")
+                    grayscale_img.save(dest_path)
+                print(f"Moved to Grayscale Folder: {image_file}")
+            else:
+                shutil.move(src_path, dest_path)
+                print(f"Moved to Color Folder: {image_file}")
         
         print("\nProcessing complete. Selected pages have been moved.")
 
