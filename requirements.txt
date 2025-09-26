@@ -1,0 +1,13 @@
+# OCR and AI Enhancement Requirements
+# ===================================
+
+# OCR Processing
+pytesseract>=0.3.10
+Pillow>=9.0.0
+
+# OpenAI API
+openai>=1.0.0
+
+# Optional: For better image preprocessing
+opencv-python>=4.5.0
+numpy>=1.21.0
