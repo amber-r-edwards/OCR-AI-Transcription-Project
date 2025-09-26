@@ -12,19 +12,20 @@ OUTPUT_DIR_COLOR = "processed_imgs/"  # Directory for color images
 os.makedirs(OUTPUT_DIR_GS, exist_ok=True)
 os.makedirs(OUTPUT_DIR_COLOR, exist_ok=True)
 
-def convert_pdf_to_images(pdf_path, output_dir, grayscale=False):
+def convert_pdf_to_images(pdf_path, output_dir, grayscale=False, dpi=300):
     """
-    Extracts pages from a PDF file and saves them as images.
+    Extracts pages from a PDF file and saves them as images with high quality.
     
     Args:
         pdf_path (str): Path to the PDF file.
         output_dir (str): Directory to save the images.
         grayscale (bool): Whether to convert the images to grayscale.
+        dpi (int): Dots per inch for image quality (higher = better quality).
     """
     try:
-        # Extract pages from the PDF file
-        print(f"Processing PDF: {pdf_path}")
-        pages = convert_from_path(pdf_path)
+        # Extract pages from the PDF file with the specified DPI (quality)
+        print(f"Processing PDF: {pdf_path} with DPI={dpi}")
+        pages = convert_from_path(pdf_path, dpi=dpi)
         
         # Iterate through each page and save as an image
         for page_num, page in enumerate(pages, start=1):
@@ -43,12 +44,13 @@ def convert_pdf_to_images(pdf_path, output_dir, grayscale=False):
     except Exception as e:
         print(f"❌ Error processing {pdf_path}: {e}")
 
-def process_pdfs(grayscale=False):
+def process_pdfs(grayscale=False, dpi=300):
     """
     Processes all PDF files in the input directory and saves images to the appropriate output directory.
     
     Args:
         grayscale (bool): Whether to convert the images to grayscale.
+        dpi (int): Dots per inch for image quality (higher = better quality).
     """
     # Determine the output directory based on grayscale flag
     output_dir = OUTPUT_DIR_GS if grayscale else OUTPUT_DIR_COLOR
@@ -63,13 +65,13 @@ def process_pdfs(grayscale=False):
     # Process each PDF file
     for pdf_file in pdf_files:
         pdf_path = os.path.join(PDF_DIR, pdf_file)
-        convert_pdf_to_images(pdf_path, output_dir, grayscale=grayscale)
+        convert_pdf_to_images(pdf_path, output_dir, grayscale=grayscale, dpi=dpi)
 
 if __name__ == "__main__":
-    # Part 1: Convert PDFs to grayscale images
-    print("=== Converting PDFs to Grayscale Images ===")
-    process_pdfs(grayscale=True)
+    # Part 1: Convert PDFs to grayscale images with high quality
+    print("=== Converting PDFs to Grayscale Images (High Quality) ===")
+    process_pdfs(grayscale=True, dpi=300)
     
-    # Part 2: Convert PDFs to color images
-    print("\n=== Converting PDFs to Color Images ===")
-    process_pdfs(grayscale=False)
+    # Part 2: Convert PDFs to color images with high quality
+    print("\n=== Converting PDFs to Color Images (High Quality) ===")
+    process_pdfs(grayscale=False, dpi=300)
