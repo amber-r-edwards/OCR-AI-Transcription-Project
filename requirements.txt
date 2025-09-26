@@ -1,5 +1,7 @@
 # OCR and AI Enhancement Requirements
 # ===================================
+# PDF Processing
+pdf2image
 
 # OCR Processing
 pytesseract>=0.3.10
