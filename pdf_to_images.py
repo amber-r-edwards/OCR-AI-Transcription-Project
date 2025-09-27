@@ -14,7 +14,7 @@ OUTPUT_DIR_GS = "processed_imgs_gs/"  # Directory for selected grayscale images
 os.makedirs(OUTPUT_DIR_COLOR, exist_ok=True)
 os.makedirs(OUTPUT_DIR_GS, exist_ok=True)
 
-def convert_pdf_to_temp_images(pdf_path, temp_dir, dpi=300):
+def convert_pdf_to_temp_images(pdf_path, temp_dir, dpi=150):
     """
     Extracts pages from a PDF file and saves them as images in a temporary directory.
     
