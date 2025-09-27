@@ -2,6 +2,7 @@ import os
 import pytesseract
 import openai
 from PIL import Image
+from pathlib import Path
 
 # Define directories
 PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
@@ -15,6 +16,10 @@ os.makedirs(RESULTS_VISION_DIR, exist_ok=True)
 
 # OpenAI API key (replace with your actual key)
 openai.api_key = "your_openai_api_key"
+
+# Define the images to process directly in the script
+grayscale_images = ["image1.png", "image2.png"]  # Replace with your grayscale image file names
+color_images = ["image3.png", "image4.png"]  # Replace with your color image file names
 
 def correct_text_with_openai(text):
     """
@@ -90,27 +95,14 @@ def process_images_with_openai_vision(image_files, input_dir, output_dir):
             print(f"❌ Error processing {image_file} with OpenAI Vision: {e}")
 
 if __name__ == "__main__":
-    while True:
-        print("\n=== OCR Processing Loop ===")
-        
-        # Step 1: Get grayscale images to process
-        print("\nEnter the names of the grayscale images to process (comma-separated):")
-        grayscale_images = input("Grayscale Images: ").split(",")
-        grayscale_images = [img.strip() for img in grayscale_images if img.strip()]
-        
-        # Step 2: Process grayscale images with Tesseract and OpenAI correction
-        process_images_with_tesseract(grayscale_images, PROCESSED_IMGS_GS_DIR, RESULTS_TESS_CORRECTION_DIR)
-        
-        # Step 3: Get color images to process
-        print("\nEnter the names of the color images to process (comma-separated):")
-        color_images = input("Color Images: ").split(",")
-        color_images = [img.strip() for img in color_images if img.strip()]
-        
-        # Step 4: Process color images with OpenAI Vision API
-        process_images_with_openai_vision(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
-        
-        # Ask if the user wants to process more images
-        continue_choice = input("\nDo you want to process more images? (yes/no): ").strip().lower()
-        if continue_choice != "yes":
-            print("Exiting the OCR processing loop.")
-            break
+    print("\n=== OCR Processing ===")
+    
+    # Step 1: Process grayscale images with Tesseract and OpenAI correction
+    print("\nProcessing grayscale images with Tesseract and OpenAI correction...")
+    process_images_with_tesseract(grayscale_images, PROCESSED_IMGS_GS_DIR, RESULTS_TESS_CORRECTION_DIR)
+    
+    # Step 2: Process color images with OpenAI Vision API
+    print("\nProcessing color images with OpenAI Vision API...")
+    process_images_with_openai_vision(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
+    
+    print("\nProcessing complete.")
