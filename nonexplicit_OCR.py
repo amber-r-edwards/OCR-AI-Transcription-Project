@@ -14,12 +14,16 @@ RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for OpenAI Visio
 os.makedirs(RESULTS_TESS_CORRECTION_DIR, exist_ok=True)
 os.makedirs(RESULTS_VISION_DIR, exist_ok=True)
 
-# OpenAI API key (replace with your actual key)
-openai.api_key = "your_openai_api_key"
+# Retrieve OpenAI API key from environment variable
+openai.api_key = os.environ.get("OPEN_AI_KEY")
+
+# Check if the API key is set
+if not openai.api_key:
+    raise ValueError("OpenAI API key not found. Please set it using 'export OPEN_AI_KEY=\"your_api_key\"'.")
 
 # Define the images to process directly in the script
-grayscale_images = ["image1.png", "image2.png"]  # Replace with your grayscale image file names
-color_images = ["image3.png", "image4.png"]  # Replace with your color image file names
+grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
+color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
 
 def correct_text_with_openai(text):
     """
