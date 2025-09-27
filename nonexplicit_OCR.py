@@ -55,7 +55,7 @@ def correct_text_with_ai(text):
         
         # Send request to OpenAI
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo",  # Use "gpt-3.5-turbo" 
             messages=[
                 {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving historical context."},
                 {"role": "user", "content": prompt}
@@ -64,7 +64,7 @@ def correct_text_with_ai(text):
             temperature=0.1  # Low temperature for more consistent corrections
         )
         
-        corrected_text = response.choices[0].message.content.strip()
+        corrected_text = response["choices"][0]["message"]["content"].strip()
         return corrected_text
     except Exception as e:
         print(f"❌ Error calling OpenAI API: {e}")
