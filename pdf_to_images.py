@@ -86,7 +86,7 @@ def process_single_pdf():
         print(f"Temporary directory created: {temp_dir}")
         
         # Convert the PDF to images in the temporary directory
-        convert_pdf_to_temp_images(pdf_path, temp_dir, dpi=300)
+        convert_pdf_to_temp_images(pdf_path, temp_dir, dpi=150)
         
         # Display the images in the temporary directory
         temp_images = [f for f in os.listdir(temp_dir) if f.endswith(".png")]
