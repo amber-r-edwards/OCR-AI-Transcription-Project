@@ -22,19 +22,28 @@ if not openai.api_key:
     raise ValueError("OpenAI API key not found. Please set it using 'export OPEN_AI_KEY=\"your_api_key\"'.")
 
 # Define the images to process directly in the script
-grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
-color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
+grayscale_images = ["image1.png", "image2.png"]  # Replace with your grayscale image file names
+color_images = ["image3.png", "image4.png"]  # Replace with your color image file names
 
-def correct_text_with_openai(text):
+def correct_text_with_openai(text, model="text-davinci-003", temperature=0.5, max_tokens=1000):
     """
     Use OpenAI's API to correct the text.
+    
+    Args:
+        text (str): The text to correct.
+        model (str): The OpenAI model to use (default: "text-davinci-003").
+        temperature (float): Sampling temperature for randomness (default: 0.5).
+        max_tokens (int): Maximum number of tokens to generate (default: 1000).
+    
+    Returns:
+        str: The corrected text.
     """
     try:
         response = openai.Completion.create(
-            engine="text-davinci-003",
+            engine=model,
             prompt=f"Correct the following OCR text:\n\n{text}",
-            max_tokens=1000,
-            temperature=0.5
+            max_tokens=max_tokens,
+            temperature=temperature
         )
         return response.choices[0].text.strip()
     except Exception as e:
