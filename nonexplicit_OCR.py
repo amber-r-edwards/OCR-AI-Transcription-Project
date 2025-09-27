@@ -22,8 +22,8 @@ if not openai.api_key:
     raise ValueError("OpenAI API key not found. Please set it using 'export OPEN_AI_KEY=\"your_api_key\"'.")
 
 # Define the images to process directly in the script
-grayscale_images = ["image1.png", "image2.png"]  # Replace with your grayscale image file names
-color_images = ["image3.png", "image4.png"]  # Replace with your color image file names
+grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
+color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
 
 def correct_text_with_openai(text, model="text-davinci-003", temperature=0.5, max_tokens=1000):
     """
