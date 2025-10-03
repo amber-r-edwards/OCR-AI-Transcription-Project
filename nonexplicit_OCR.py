@@ -5,6 +5,17 @@ from PIL import Image
 from pathlib import Path
 
 
+# Define directories
+PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
+PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
+RESULTS_TESS_CORRECTION_DIR = "results_nonexplicit/tess_correction/"  # Directory for Tesseract + OpenAI correction results
+RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for Tesseract OCR results (color images)
+
+# Define the images
+grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
+color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
+
+
 def create_correction_prompt(text):
     """
     Create a prompt for OpenAI to correct the text.
