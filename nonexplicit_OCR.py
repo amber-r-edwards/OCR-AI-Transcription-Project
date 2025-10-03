@@ -114,66 +114,54 @@ def encode_image(image_path):
 
 def transcribe_with_vision_api(image_path, api_key):
     """
-    Send image to OpenAI Vision API for text transcription.
-    
+    Transcribe text from an image using the OpenAI Vision API.
+
     Args:
-        image_path (str): Path to the image file
-        api_key (str): OpenAI API key
-        
+        image_path (str): Path to the image file.
+        api_key (str): OpenAI API key.
+
     Returns:
         tuple: (transcribed_text, usage_info)
     """
     try:
         # Initialize OpenAI client
-        client = openai(api_key=api_key)
-        
+        openai.api_key = api_key
+
         # Encode the image
         base64_image = encode_image(image_path)
-        
         if not base64_image:
             return None, None
-        
+
         # Determine image format
         image_format = Path(image_path).suffix.lower()
         if image_format not in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
             print(f"Warning: {image_format} may not be supported by Vision API")
-        
+
         # Send request to OpenAI Vision API
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-4o",  # Using GPT-4o for vision capabilities
             messages=[
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": """Please transcribe all the text visible in this image. The text may be in any language including English, Spanish, French, German, Chinese, Japanese, Korean, Arabic, Hindi, Tamil, or other languages.
-                            
-                            Instructions:
-                            1. Extract ALL text from the image, preserving the original layout, structure, and content.
-                            2. Maintain line breaks and paragraph structure
-                            3. Do not add any commentary or interpretation
-                            4. If text is unclear or partially obscured, transcribe what you can see
-                            5. Preserve original spelling and formatting in the original language
-                            6. Include headers, titles, dates, and all visible text elements
-                            7. If the text is in a non-Latin script (like Arabic, Chinese, Tamil, etc.), transcribe it exactly as written
-                            8. Do not translate the text - only transcribe it
-                            
-                            Return only the transcribed text in its original language."""
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/{image_format[1:]};base64,{base64_image}"
-                            }
-                        }
-                    ]
+                    "content": f"""Please transcribe all the text visible in this image. The text may be in any language including English, Spanish, French, German, Chinese, Japanese, Korean, Arabic, Hindi, Tamil, or other languages.
+
+Instructions:
+1. Extract ALL text from the image, preserving the original layout, structure, and content.
+2. Maintain line breaks and paragraph structure.
+3. Do not add any commentary or interpretation.
+4. If text is unclear or partially obscured, transcribe what you can see.
+5. Preserve original spelling and formatting in the original language.
+6. Include headers, titles, dates, and all visible text elements.
+7. If the text is in a non-Latin script (like Arabic, Chinese, Tamil, etc.), transcribe it exactly as written.
+8. Do not translate the text - only transcribe it.
+
+Image data: data:image/{image_format[1:]};base64,{base64_image}"""
                 }
             ],
             max_tokens=4000,
             temperature=0.1  # Low temperature for consistent transcription
         )
-        
+
         # Extract usage information
         usage = response.usage
         usage_info = {
@@ -181,12 +169,13 @@ def transcribe_with_vision_api(image_path, api_key):
             'completion_tokens': usage.completion_tokens,
             'total_tokens': usage.total_tokens
         }
-        
+
+        # Extract the transcribed text
         transcribed_text = response.choices[0].message.content.strip()
         return transcribed_text, usage_info
-        
+
     except Exception as e:
-        print(f"Error calling OpenAI Vision API: {e}")
+        print(f"❌ Error calling OpenAI Vision API: {e}")
         return None, None
 
 def main():
@@ -197,7 +186,7 @@ def main():
     PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
     PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
     RESULTS_TESS_CORRECTION_DIR = "results_nonexplicit/tess_correction/"  # Directory for Tesseract + OpenAI correction results
-    RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for Tesseract OCR results (color images)
+    RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for OpenAI Vision results
 
     # Ensure output directories exist
     os.makedirs(RESULTS_TESS_CORRECTION_DIR, exist_ok=True)
@@ -207,19 +196,26 @@ def main():
     grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
     color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
 
-    # Process with Tesseract and correction
-    print("Starting Tesseract + Correction processing...")
-    process_images_with_tesseract_and_ai(grayscale_images, PROCESSED_IMGS_GS_DIR, RESULTS_TESS_CORRECTION_DIR)
-
-    # Process with OpenAI Vision
-    print("Starting OpenAI Vision processing...")
     # Retrieve the API key from the environment variable
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
-    
-    transcribe_with_vision_api(color_images, api_key=api_key)
 
+    # Process grayscale images with Tesseract + AI correction
+    print("Starting Tesseract + Correction processing for grayscale images...")
+    process_images_with_tesseract_and_ai(grayscale_images, PROCESSED_IMGS_GS_DIR, RESULTS_TESS_CORRECTION_DIR)
+
+    # Process color images with OpenAI Vision
+    print("Starting OpenAI Vision processing for color images...")
+    for image_file in color_images:
+        image_path = os.path.join(PROCESSED_IMGS_DIR, image_file)
+        transcribed_text, usage_info = transcribe_with_vision_api(image_path, api_key)
+        if transcribed_text:
+            # Save the transcribed text to a .txt file
+            output_file = os.path.join(RESULTS_VISION_DIR, f"{Path(image_file).stem}_vision.txt")
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(transcribed_text)
+            print(f"Saved Vision OCR text to: {output_file}")
 
 if __name__ == "__main__":
     main()
