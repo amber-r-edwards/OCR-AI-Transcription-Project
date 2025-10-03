@@ -68,21 +68,6 @@ def correct_text_with_ai(text):
         # Extract the corrected text from the response
         corrected_text = response.choices[0].message.content.strip()
 
-         # Extract token usage and calculate cost
-        token_usage = response.usage  # Contains 'prompt_tokens', 'completion_tokens', and 'total_tokens'
-        prompt_tokens = token_usage["prompt_tokens"]
-        completion_tokens = token_usage["completion_tokens"]
-        total_tokens = token_usage["total_tokens"]
-
-        # OpenAI pricing for gpt-3.5-turbo (as of 2023): $0.0015 per 1k prompt tokens, $0.002 per 1k completion tokens
-        cost_per_prompt_token = 0.0015 / 1000
-        cost_per_completion_token = 0.002 / 1000
-        estimated_cost = (prompt_tokens * cost_per_prompt_token) + (completion_tokens * cost_per_completion_token)
-
-        # Print token usage and cost
-        print(f"🔹 Token Usage: Prompt = {prompt_tokens}, Completion = {completion_tokens}, Total = {total_tokens}")
-        print(f"💰 Estimated Cost: ${estimated_cost:.6f}")
-
         return corrected_text
 
     except Exception as e:
@@ -111,6 +96,65 @@ def process_images_with_tesseract_and_ai(image_files, input_dir, output_dir):
             print(f"Saved corrected text to: {output_file}")
         except Exception as e:
             print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
+
+def calculate_cost(usage_info, model="gpt-4o"):
+    """
+    Calculate estimated cost based on token usage.
+    
+    Args:
+        usage_info (dict): Token usage information
+        model (str): Model used for the API call
+        
+    Returns:
+        dict: Cost breakdown
+    """
+    # Pricing per 1K tokens (as of 2024)
+    pricing = {
+        "gpt-3.5-turbo": {
+            "input": 0.0005,   # $0.50 per 1M tokens
+            "output": 0.0015   # $1.50 per 1M tokens
+        },
+        "gpt-4o": {
+            "input": 0.005,    # $5.00 per 1M tokens
+            "output": 0.015    # $15.00 per 1M tokens
+        }
+    }
+    
+    if model not in pricing:
+        model = "gpt-4o"  # Default fallback
+    
+    input_cost = (usage_info['prompt_tokens'] / 1000) * pricing[model]["input"]
+    output_cost = (usage_info['completion_tokens'] / 1000) * pricing[model]["output"]
+    total_cost = input_cost + output_cost
+    
+    return {
+        "input_cost": input_cost,
+        "output_cost": output_cost,
+        "total_cost": total_cost,
+        "model": model
+    }
+
+
+def print_usage_summary(usage_info, cost_info):
+    """
+    Print token usage and cost summary to terminal.
+    
+    Args:
+        usage_info (dict): Token usage information
+        cost_info (dict): Cost breakdown
+    """
+    print("\n" + "=" * 50)
+    print("OPENAI VISION API USAGE SUMMARY")
+    print("=" * 50)
+    print(f"Model: {cost_info['model']}")
+    print(f"Prompt Tokens:  {usage_info['prompt_tokens']:,}")
+    print(f"Output Tokens:  {usage_info['completion_tokens']:,}")
+    print(f"Total Tokens:   {usage_info['total_tokens']:,}")
+    print("-" * 50)
+    print(f"Input Cost:     ${cost_info['input_cost']:.4f}")
+    print(f"Output Cost:    ${cost_info['output_cost']:.4f}")
+    print(f"Total Cost:     ${cost_info['total_cost']:.4f}")
+    print("=" * 50)
 
 if __name__ == "__main__":
     print("\n=== OCR Processing ===")
