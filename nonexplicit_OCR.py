@@ -66,8 +66,9 @@ def correct_text_with_ai(text):
         )
         
         # Extract the corrected text from the response
-        corrected_text = response["choices"][0]["message"]["content"].strip()
+        corrected_text = response.choices[0].message.content.strip()
         return corrected_text
+        
     except Exception as e:
         print(f"❌ Error calling OpenAI API: {e}")
         return text  # Return the original text if correction fails
