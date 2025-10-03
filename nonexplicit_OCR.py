@@ -117,6 +117,10 @@ def calculate_cost(usage_info, model="gpt-4o"):
         "gpt-4o": {
             "input": 0.005,    # $5.00 per 1M tokens
             "output": 0.015    # $15.00 per 1M tokens
+        },
+        "gpt-5-mini": {
+            "input": 0.0025     #$0.25 per 1M tokens
+            "output": 0.002     # $2.00 per 1M tokens   
         }
     }
     
@@ -133,7 +137,6 @@ def calculate_cost(usage_info, model="gpt-4o"):
         "total_cost": total_cost,
         "model": model
     }
-
 
 def print_usage_summary(usage_info, cost_info):
     """
