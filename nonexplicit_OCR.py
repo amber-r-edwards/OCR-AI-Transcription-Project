@@ -54,8 +54,8 @@ def correct_text_with_ai(text):
         prompt = create_correction_prompt(text)
         
         # Send request to OpenAI
-        response = openai.ChatCompletion.create(
-            model="gpt-4",  # Use "gpt-4" or "gpt-3.5-turbo" depending on your subscription
+        response = client.responses.create(
+            model="gpt-5-mini", #model selected: GPT-5 Mini
             messages=[
                 {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving historical context."},
                 {"role": "user", "content": prompt}
