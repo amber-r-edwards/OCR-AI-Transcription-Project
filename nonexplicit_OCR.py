@@ -14,12 +14,6 @@ RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for Tesseract OC
 os.makedirs(RESULTS_TESS_CORRECTION_DIR, exist_ok=True)
 os.makedirs(RESULTS_VISION_DIR, exist_ok=True)
 
-# Retrieve OpenAI API key from environment variable
-openai.api_key = os.environ.get("OPEN_AI_KEY")
-
-# Check if the API key is set
-if not openai.api_key:
-    raise ValueError("OpenAI API key not found. Please set it using 'export OPEN_AI_KEY=\"your_api_key\"'.")
 
 # Define the images to process directly in the script
 grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
@@ -50,15 +44,19 @@ def correct_text_with_ai(text):
     Send text to OpenAI API for correction.
     """
     try:
-        # Initialize OpenAI client
-        client = OpenAI(api_key=api_key)
+         # Initialize OpenAI client
+        api_key = os.getenv("OPENAI_API_KEY")  # Load API key from environment variable
+        if not api_key:
+            raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
+        client = openai  # Use the OpenAI library as the client
+        openai.api_key = api_key  # Set the API key
 
         # Create the correction prompt
         prompt = create_correction_prompt(text)
         
         # Send request to OpenAI
         response = client.chat.completions.create(
-            model="gpt-5-mini", #model selected: GPT-5 Mini
+            model="gpt-3.5-turbo", #model selected: GPT-3.5-turbo
             messages=[
                 {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving the exact words on the pages."},
                 {"role": "user", "content": prompt}
