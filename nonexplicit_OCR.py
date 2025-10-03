@@ -4,20 +4,6 @@ import openai
 from PIL import Image
 from pathlib import Path
 
-# Define directories
-PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
-PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
-RESULTS_TESS_CORRECTION_DIR = "results_nonexplicit/tess_correction/"  # Directory for Tesseract + OpenAI correction results
-RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for Tesseract OCR results (color images)
-
-# Ensure output directories exist
-os.makedirs(RESULTS_TESS_CORRECTION_DIR, exist_ok=True)
-os.makedirs(RESULTS_VISION_DIR, exist_ok=True)
-
-
-# Define the images to process directly in the script
-grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
-color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
 
 def create_correction_prompt(text):
     """
@@ -132,20 +118,27 @@ def main():
     """
     Main function to process images with both Tesseract + correction and OpenAI Vision.
     """
-    input_dir = "path/to/input_dir"  # Replace with your input directory
-    output_dir = "path/to/output_dir"  # Replace with your output directory
-    image_files = [f for f in os.listdir(input_dir) if f.endswith((".png", ".jpg", ".jpeg"))]
+    # Define directories
+    PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
+    PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
+    RESULTS_TESS_CORRECTION_DIR = "results_nonexplicit/tess_correction/"  # Directory for Tesseract + OpenAI correction results
+    RESULTS_VISION_DIR = "results_nonexplicit/vision/"  # Directory for Tesseract OCR results (color images)
 
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+    # Ensure output directories exist
+    os.makedirs(RESULTS_TESS_CORRECTION_DIR, exist_ok=True)
+    os.makedirs(RESULTS_VISION_DIR, exist_ok=True)
+
+    # Define the images to process directly in the script
+    grayscale_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your grayscale image file names
+    color_images = ["AintVol1No7_page_003.png", "OOBVol1No1_page_006.png", "BabeVol1No2_page_012.png"]  # Replace with your color image file names
 
     # Process with Tesseract and correction
     print("Starting Tesseract + Correction processing...")
-    process_images_with_tesseract_and_ai(image_files, input_dir, output_dir)
+    process_images_with_tesseract_and_ai(grayscale_images, PROCESSED_IMGS_GS_DIR, RESULTS_TESS_CORRECTION_DIR)
 
     # Process with OpenAI Vision
     print("Starting OpenAI Vision processing...")
-    process_images_with_openai_vision(image_files, input_dir, output_dir)
+    process_images_with_openai_vision(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
 
 
 if __name__ == "__main__":
