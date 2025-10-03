@@ -72,7 +72,7 @@ def correct_text_with_ai(text):
         print(f"❌ Error calling OpenAI API: {e}")
         return text  # Return the original text if correction fails
 
-def process_images_with_tesseract_and_ai(image_files, input_dir, output_dir):
+def process_images_with_tesseract_and_ai(image_files, input_dir="processed_imgs_gs/", output_dir="results_nonexplicit/tess_correction/"):
     """
     Process images with Tesseract OCR and correct the text using OpenAI.
     """
@@ -213,7 +213,12 @@ def main():
 
     # Process with OpenAI Vision
     print("Starting OpenAI Vision processing...")
-    transcribe_with_vision_api(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
+    # Retrieve the API key from the environment variable
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
+    
+    transcribe_with_vision_api(color_images, api_key=api_key)
 
 
 if __name__ == "__main__":
