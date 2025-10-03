@@ -61,14 +61,30 @@ def correct_text_with_ai(text):
                 {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving the exact words on the pages."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=2000,
+            max_tokens=3000,
             temperature=0.1  # Low temperature for more consistent corrections
         )
         
         # Extract the corrected text from the response
         corrected_text = response.choices[0].message.content.strip()
+
+         # Extract token usage and calculate cost
+        token_usage = response.usage  # Contains 'prompt_tokens', 'completion_tokens', and 'total_tokens'
+        prompt_tokens = token_usage["prompt_tokens"]
+        completion_tokens = token_usage["completion_tokens"]
+        total_tokens = token_usage["total_tokens"]
+
+        # OpenAI pricing for gpt-3.5-turbo (as of 2023): $0.0015 per 1k prompt tokens, $0.002 per 1k completion tokens
+        cost_per_prompt_token = 0.0015 / 1000
+        cost_per_completion_token = 0.002 / 1000
+        estimated_cost = (prompt_tokens * cost_per_prompt_token) + (completion_tokens * cost_per_completion_token)
+
+        # Print token usage and cost
+        print(f"🔹 Token Usage: Prompt = {prompt_tokens}, Completion = {completion_tokens}, Total = {total_tokens}")
+        print(f"💰 Estimated Cost: ${estimated_cost:.6f}")
+
         return corrected_text
-        
+
     except Exception as e:
         print(f"❌ Error calling OpenAI API: {e}")
         return text  # Return the original text if correction fails
