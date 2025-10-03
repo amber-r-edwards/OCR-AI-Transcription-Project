@@ -97,6 +97,60 @@ def process_images_with_tesseract_and_ai(image_files, input_dir, output_dir):
         except Exception as e:
             print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
 
+
+def process_images_with_openai_vision(image_files, input_dir, output_dir):
+    """
+    Process images directly using OpenAI Vision API.
+    """
+    for image_file in image_files:
+        image_path = os.path.join(input_dir, image_file)
+        try:
+            print(f"Processing with OpenAI Vision: {image_file}")
+            
+            # Open the image file
+            with open(image_path, "rb") as image:
+                # Send the image to OpenAI Vision API
+                response = openai.Image.create(
+                    file=image,
+                    purpose="ocr"
+                )
+            
+            # Extract the text from the response
+            vision_text = response["data"]["text"]
+            print(f"Vision OCR Text: {vision_text[:100]}...")  # Show a snippet of the Vision OCR text
+            
+            # Save the Vision OCR text to a .txt file
+            output_file = os.path.join(output_dir, f"{Path(image_file).stem}_vision.txt")
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(vision_text)
+            print(f"Saved Vision OCR text to: {output_file}")
+        except Exception as e:
+            print(f"❌ Error processing {image_file} with OpenAI Vision: {e}")
+
+
+def main():
+    """
+    Main function to process images with both Tesseract + correction and OpenAI Vision.
+    """
+    input_dir = "path/to/input_dir"  # Replace with your input directory
+    output_dir = "path/to/output_dir"  # Replace with your output directory
+    image_files = [f for f in os.listdir(input_dir) if f.endswith((".png", ".jpg", ".jpeg"))]
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Process with Tesseract and correction
+    print("Starting Tesseract + Correction processing...")
+    process_images_with_tesseract_and_ai(image_files, input_dir, output_dir)
+
+    # Process with OpenAI Vision
+    print("Starting OpenAI Vision processing...")
+    process_images_with_openai_vision(image_files, input_dir, output_dir)
+
+
+if __name__ == "__main__":
+    main()
+
 def calculate_cost(usage_info, model="gpt-4o"):
     """
     Calculate estimated cost based on token usage.
