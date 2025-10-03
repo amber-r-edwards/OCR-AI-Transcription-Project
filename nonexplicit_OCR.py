@@ -3,6 +3,7 @@ import pytesseract
 import openai
 from PIL import Image
 from pathlib import Path
+import base64
 
 
 # Define directories
@@ -94,36 +95,99 @@ def process_images_with_tesseract_and_ai(image_files, input_dir, output_dir):
         except Exception as e:
             print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
 
-
-def process_images_with_openai_vision(image_files, input_dir, output_dir):
+def encode_image(image_path):
     """
-    Process images directly using OpenAI Vision API.
+    Encode an image file to a base64 string.
+           
+    Args:
+        image_path (str): Path to the image file.
+                
+    Returns:
+        str: Base64 encoded string of the image.
     """
-    for image_file in image_files:
-        image_path = os.path.join(input_dir, image_file)
-        try:
-            print(f"Processing with OpenAI Vision: {image_file}")
-            
-            # Open the image file
-            with open(image_path, "rb") as image:
-                # Send the image to OpenAI Vision API
-                response = openai.Image.create(
-                    file=image,
-                    purpose="ocr"
-                )
-            
-            # Extract the text from the response
-            vision_text = response["data"]["text"]
-            print(f"Vision OCR Text: {vision_text[:100]}...")  # Show a snippet of the Vision OCR text
-            
-            # Save the Vision OCR text to a .txt file
-            output_file = os.path.join(output_dir, f"{Path(image_file).stem}_vision.txt")
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(vision_text)
-            print(f"Saved Vision OCR text to: {output_file}")
-        except Exception as e:
-            print(f"❌ Error processing {image_file} with OpenAI Vision: {e}")
+    try:
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
+    except Exception as e:
+        print(f"Error encoding image {image_path}: {e}")
+        return None
 
+def transcribe_with_vision_api(image_path, api_key):
+    """
+    Send image to OpenAI Vision API for text transcription.
+    
+    Args:
+        image_path (str): Path to the image file
+        api_key (str): OpenAI API key
+        
+    Returns:
+        tuple: (transcribed_text, usage_info)
+    """
+    try:
+        # Initialize OpenAI client
+        client = openai(api_key=api_key)
+        
+        # Encode the image
+        base64_image = encode_image(image_path)
+        
+        if not base64_image:
+            return None, None
+        
+        # Determine image format
+        image_format = Path(image_path).suffix.lower()
+        if image_format not in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+            print(f"Warning: {image_format} may not be supported by Vision API")
+        
+        # Send request to OpenAI Vision API
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Using GPT-4o for vision capabilities
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": """Please transcribe all the text visible in this image. The text may be in any language including English, Spanish, French, German, Chinese, Japanese, Korean, Arabic, Hindi, Tamil, or other languages.
+                            
+                            Instructions:
+                            1. Extract ALL text from the image, preserving the original layout, structure, and content.
+                            2. Maintain line breaks and paragraph structure
+                            3. Do not add any commentary or interpretation
+                            4. If text is unclear or partially obscured, transcribe what you can see
+                            5. Preserve original spelling and formatting in the original language
+                            6. Include headers, titles, dates, and all visible text elements
+                            7. If the text is in a non-Latin script (like Arabic, Chinese, Tamil, etc.), transcribe it exactly as written
+                            8. Do not translate the text - only transcribe it
+                            
+                            Return only the transcribed text in its original language."""
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/{image_format[1:]};base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=4000,
+            temperature=0.1  # Low temperature for consistent transcription
+        )
+        
+        # Extract usage information
+        usage = response.usage
+        usage_info = {
+            'prompt_tokens': usage.prompt_tokens,
+            'completion_tokens': usage.completion_tokens,
+            'total_tokens': usage.total_tokens
+        }
+        
+        transcribed_text = response.choices[0].message.content.strip()
+        return transcribed_text, usage_info
+        
+    except Exception as e:
+        print(f"Error calling OpenAI Vision API: {e}")
+        return None, None
 
 def main():
     """
@@ -149,7 +213,7 @@ def main():
 
     # Process with OpenAI Vision
     print("Starting OpenAI Vision processing...")
-    process_images_with_openai_vision(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
+    transcribe_with_vision_api(color_images, PROCESSED_IMGS_DIR, RESULTS_VISION_DIR)
 
 
 if __name__ == "__main__":
