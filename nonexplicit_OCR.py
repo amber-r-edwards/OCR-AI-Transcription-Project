@@ -95,6 +95,16 @@ def process_images_with_tesseract_and_ai(image_files, input_dir="processed_imgs_
         except Exception as e:
             print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
 
+from PIL import Image
+
+def resize_image(image_path, max_width=1024, max_height=1024):
+    """
+    Resize the image to reduce its size while maintaining aspect ratio.
+    """
+    with Image.open(image_path) as img:
+        img.thumbnail((max_width, max_height))
+        img.save(image_path)  # Overwrite the original image with the resized version
+
 def encode_image(image_path):
     """
     Encode an image file to a base64 string.
@@ -127,6 +137,9 @@ def transcribe_with_vision_api(image_path, api_key):
         # Initialize OpenAI client
         openai.api_key = api_key
 
+         # Resize the image to reduce its size
+        resize_image(image_path)
+
         # Encode the image
         base64_image = encode_image(image_path)
         if not base64_image:
@@ -139,7 +152,7 @@ def transcribe_with_vision_api(image_path, api_key):
 
         # Send request to OpenAI Vision API
         response = openai.chat.completions.create(
-            model="gpt-4o",  # Using GPT-4o for vision capabilities
+            model="gpt-3.5-turbo",  # Using GPT-3.5-turbo for vision capabilities
             messages=[
                 {
                     "role": "user",
@@ -149,11 +162,8 @@ Instructions:
 1. Extract ALL text from the image, preserving the original layout, structure, and content.
 2. Maintain line breaks and paragraph structure.
 3. Do not add any commentary or interpretation.
-4. If text is unclear or partially obscured, transcribe what you can see.
-5. Preserve original spelling and formatting in the original language.
-6. Include headers, titles, dates, and all visible text elements.
-7. If the text is in a non-Latin script (like Arabic, Chinese, Tamil, etc.), transcribe it exactly as written.
-8. Do not translate the text - only transcribe it.
+4. Preserve original spelling and formatting in the original language.
+5. Include headers, titles, dates, and all visible text elements.
 
 Image data: data:image/{image_format[1:]};base64,{base64_image}"""
                 }
