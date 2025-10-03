@@ -36,8 +36,8 @@ Please:
 1. Fix obvious OCR errors (like '0' instead of 'O', '1' instead of 'l', etc.)
 2. Add appropriate punctuation and capitalization
 3. Fix spacing and line breaks where needed
-4. Preserve the original meaning and historical context
-5. If a word is unclear, make your best guess based on context
+4. Preserve the words as they are on the page, do not add in any additional context.
+
 
 Text to correct:
 {text}
@@ -50,14 +50,17 @@ def correct_text_with_ai(text):
     Send text to OpenAI API for correction.
     """
     try:
+        # Initialize OpenAI client
+        client = OpenAI(api_key=api_key)
+
         # Create the correction prompt
         prompt = create_correction_prompt(text)
         
         # Send request to OpenAI
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model="gpt-5-mini", #model selected: GPT-5 Mini
             messages=[
-                {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving historical context."},
+                {"role": "system", "content": "You are an expert at correcting OCR text from historical documents. Focus on accuracy and preserving the exact words on the pages."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=2000,
