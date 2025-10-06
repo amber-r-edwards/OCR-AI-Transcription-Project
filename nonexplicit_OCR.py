@@ -1,6 +1,6 @@
 import os
 import pytesseract
-import openai
+from openai import OpenAI
 from PIL import Image
 from pathlib import Path
 import base64
@@ -48,6 +48,25 @@ def encode_image(image_path):
         print(f"Error encoding image {image_path}: {e}")
         return None
 
+
+def resolve_image_path(images_dir, filename):
+    """
+    Resolve an image path by trying the given filename and common extensions.
+
+    Tries in order: exact filename, then swap extension among .png, .jpg, .jpeg.
+    Returns the first existing path, or None if not found.
+    """
+    # Try exact
+    candidate = os.path.join(images_dir, filename)
+    if os.path.exists(candidate):
+        return candidate
+
+    stem = Path(filename).stem
+    for ext in [".png", ".jpg", ".jpeg"]:
+        candidate = os.path.join(images_dir, f"{stem}{ext}")
+        if os.path.exists(candidate):
+            return candidate
+    return None
 
 def transcribe_with_vision_api(image_path, api_key):
     """
@@ -141,25 +160,32 @@ def main():
     if not api_key:
         raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
 
+    # Initialize OpenAI client once for reuse
+    client = OpenAI(api_key=api_key)
+
     # Process grayscale images with Tesseract + AI correction
     print("Starting Tesseract + Correction processing for grayscale images...")
     for image_file in grayscale_images:
-        image_path = os.path.join(PROCESSED_IMGS_GS_DIR, image_file)
+        image_path = resolve_image_path(PROCESSED_IMGS_GS_DIR, image_file)
+        if not image_path:
+            print(f"❌ Could not find grayscale image with any common extension: {image_file}")
+            continue
         try:
             # Perform OCR using Tesseract
             ocr_text = pytesseract.image_to_string(Image.open(image_path), config="--psm 3")
             print(f"OCR Text: {ocr_text[:100]}...")  # Show a snippet of the OCR text
 
-            # Correct the text using OpenAI
-            corrected_text = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+            # Correct the text using OpenAI (new SDK interface)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are an expert at correcting OCR text from historical documents."},
                     {"role": "user", "content": create_correction_prompt(ocr_text)}
                 ],
                 max_tokens=3000,
                 temperature=0.1
-            ).choices[0].message.content.strip()
+            )
+            corrected_text = response.choices[0].message.content.strip()
 
             # Save the corrected text to a .txt file
             output_file = os.path.join(RESULTS_TESS_CORRECTION_DIR, f"{Path(image_file).stem}_corrected.txt")
@@ -172,7 +198,10 @@ def main():
     # Process color images with OpenAI Vision
     print("Starting OpenAI Vision processing for color images...")
     for image_file in color_images:
-        image_path = os.path.join(PROCESSED_IMGS_DIR, image_file)
+        image_path = resolve_image_path(PROCESSED_IMGS_DIR, image_file)
+        if not image_path:
+            print(f"❌ Could not find image with any common extension: {image_file}")
+            continue
         transcribed_text, usage_info = transcribe_with_vision_api(image_path, api_key)
         if transcribed_text:
             # Save the transcribed text to a .txt file
