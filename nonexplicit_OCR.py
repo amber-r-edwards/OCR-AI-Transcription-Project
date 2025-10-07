@@ -98,14 +98,41 @@ def transcribe_with_vision_api(image_path, api_key):
 
         # Send request to OpenAI Vision API using the correct format
         response = client.chat.completions.create(
-            model="gpt-4o",  # Use gpt-4o or gpt-4-vision-preview for vision capabilities
+            model="gpt-4o",
             messages=[
+                {
+                    "role": "system",
+                    "content": "You are a precise transcription assistant specializing in historical documents from the women's liberation movement. Your task is to transcribe text exactly as it appears, without interpretation, correction, or addition."
+                },
                 {
                     "role": "user",
                     "content": [
                         {
                             "type": "text",
-                            "text": "You have the experience of a historian studying the women's liberation movement in the US. Please transcribe all of the text visible in this image. Extract ALL text, preserving the original layout and structure, line breaks, and paragraphs. Do not add any commentary or interpretation, do not repeat phrases. If the text is unclear, transcribe what you can see. Preserve original spelling and formatting. Include headers, titles, dates, and all visible text elements. Do not translate the text, only transcribe it."
+                            "text": """Transcribe ALL text visible in this image with complete accuracy. Follow these rules strictly:
+
+CRITICAL RULES:
+1. Transcribe ONLY what you see - do not invent, assume, or fill in missing text
+2. If text is unclear or illegible, use [illegible] or [unclear] markers
+3. Do not add interpretations, corrections, or modernizations
+4. Do not repeat or duplicate any text
+5. If you're uncertain about a word, transcribe your best guess followed by [?]
+
+FORMATTING REQUIREMENTS:
+- Preserve exact layout, line breaks, and paragraph structure
+- Maintain original spelling, punctuation, and capitalization (including errors)
+- Include ALL headers, titles, dates, page numbers, and marginal notes
+- Preserve column structure if present
+- Indicate special formatting: *bold*, _italic_, ALL CAPS as shown
+
+STRUCTURE:
+- Start each distinct section with a blank line
+- Preserve indentation where visible
+- Note any handwritten annotations as [handwritten: text]
+- Indicate images, graphics, or non-text elements as [IMAGE: brief description]
+
+Begin transcription below:
+---"""
                         },
                         {
                             "type": "image_url",
@@ -117,7 +144,7 @@ def transcribe_with_vision_api(image_path, api_key):
                 }
             ],
             max_tokens=4000,
-            temperature=0.1
+            temperature=0.0  # Set to 0 for maximum consistency and minimal creativity
         )
 
         # Extract usage information
@@ -142,7 +169,7 @@ def transcribe_with_vision_api(image_path, api_key):
         print(f"💰 Estimated Cost: ${estimated_cost:.6f}")
         
         return transcribed_text, usage_info
-    
+
     except Exception as e:
         print(f"❌ Error calling OpenAI Vision API: {e}")
         return None, None
