@@ -122,7 +122,7 @@ def transcribe_with_vision_api(image_path, api_key):
             print(f"Warning: {image_format} may not be supported by Vision API")
 
         # Send request to OpenAI Vision API using the responses endpoint
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model="gpt-5-mini",
             messages=[
                 {
@@ -228,14 +228,55 @@ def main():
             break
         print("Invalid choice. Please enter 1, 2, or 3.")
 
+    # Determine which images to show based on method choice
+    if choice == '1':
+        available_images = grayscale_images
+        image_type = "grayscale"
+    elif choice == '2':
+        available_images = color_images
+        image_type = "color"
+    else:  # choice == '3'
+        # For both methods, combine both lists (remove duplicates)
+        available_images = list(set(grayscale_images + color_images))
+        image_type = "all"
+
+    # Ask user which images to process
+    print(f"\n=== Select Images to Process ({image_type}) ===")
+    print("0. Process ALL images")
+    for idx, img in enumerate(available_images, 1):
+        print(f"{idx}. {img}")
+    
+    while True:
+        image_choice = input("\nEnter image number(s) (comma-separated, or 0 for all): ").strip()
+        try:
+            # Parse the input
+            if image_choice == '0':
+                selected_images = available_images
+                break
+            else:
+                # Split by comma and convert to integers
+                indices = [int(x.strip()) for x in image_choice.split(',')]
+                # Validate indices
+                if all(1 <= idx <= len(available_images) for idx in indices):
+                    selected_images = [available_images[idx - 1] for idx in indices]
+                    break
+                else:
+                    print(f"Invalid selection. Please enter numbers between 1 and {len(available_images)}, or 0 for all.")
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by commas.")
+
+    print(f"\n✅ Selected {len(selected_images)} image(s) for processing")
+
     # Process grayscale images with Tesseract + AI correction
     if choice in ['1', '3']:
         print("\n=== Starting Tesseract + Correction processing for grayscale images ===")
-        for image_file in grayscale_images:
+        
+        # Filter to only process selected grayscale images
+        images_to_process = [img for img in selected_images if img in grayscale_images]
+        
+        for image_file in images_to_process:
             image_path = resolve_image_path(PROCESSED_IMGS_GS_DIR, image_file)
-            if not image_path:
-                print(f"❌ Could not find grayscale image with any common extension: {image_file}")
-                continue
+                
             try:
                 # Perform OCR using Tesseract
                 print(f"\nProcessing: {image_file}")
@@ -247,7 +288,7 @@ def main():
                     model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": "You are an expert at correcting OCR text from historical documents."},
-                        {"role": "user", "content": create_correction_prompt(ocr_text)}  # Changed to pass ocr_text
+                        {"role": "user", "content": create_correction_prompt(ocr_text)}
                     ],
                     max_tokens=3000,
                     temperature=0.1
@@ -265,7 +306,11 @@ def main():
     # Process color images with OpenAI Vision
     if choice in ['2', '3']:
         print("\n=== Starting OpenAI Vision processing for color images ===")
-        for image_file in color_images:
+        
+        # Filter to only process selected color images
+        images_to_process = [img for img in selected_images if img in color_images]
+        
+        for image_file in images_to_process:
             image_path = resolve_image_path(PROCESSED_IMGS_DIR, image_file)
             if not image_path:
                 print(f"❌ Could not find image with any common extension: {image_file}")
@@ -281,6 +326,14 @@ def main():
                 print(f"✅ Saved Vision OCR text to: {output_file}")
 
     print("\n=== Processing Complete ===")
+
+
+if __name__ == "__main__":
+    main()
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":
