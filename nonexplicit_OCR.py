@@ -105,7 +105,7 @@ def transcribe_with_vision_api(image_path, api_key):
                     "content": [
                         {
                             "type": "text",
-                            "text": "Please transcribe all text from this image. Preserve layout, line breaks, and original spelling. Do not translate or interpret. Transcribe the text exactly as is on the page."
+                            "text": "You have the experience of a historian studying the women's liberation movement in the US. Please transcribe all of the text visible in this image. Extract ALL text, preserving the original layout and structure, line breaks, and paragraphs. Do not add any commentary or interpretation, do not repeat phrases. If the text is unclear, transcribe what you can see. Preserve original spelling and formatting. Include headers, titles, dates, and all visible text elements. Do not translate the text, only transcribe it."
                         },
                         {
                             "type": "image_url",
