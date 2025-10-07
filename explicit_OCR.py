@@ -13,8 +13,8 @@ RESULTS_TESS_CORRECTION_DIR = "results_explicit/tess_correction/"  # Directory f
 RESULTS_VISION_DIR = "results_explicit/vision/"  # Directory for Vision API results (color images)
 
 # Define the images for explicit content processing
-grayscale_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003.png", "HaightVol2No3_page_006.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your grayscale image file names
-color_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003C.png", "HaightVol2No3_page_006C.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your color image file names
+grayscale_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003C.png", "HaightVol2No3_page_006C.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your grayscale image file names
+color_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003.png", "HaightVol2No3_page_006.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your color image file names
 
 
 def create_correction_prompt(ocr_text, document_type="historical document"):
