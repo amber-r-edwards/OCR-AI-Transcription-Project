@@ -163,52 +163,71 @@ def main():
     # Initialize OpenAI client once for reuse
     client = OpenAI(api_key=api_key)
 
+    # Ask user which processing method they want to use
+    print("\n=== OCR Processing Options ===")
+    print("1. Tesseract + AI Correction (for grayscale images)")
+    print("2. OpenAI Vision API (for color images)")
+    print("3. Both methods")
+    
+    while True:
+        choice = input("\nEnter your choice (1, 2, or 3): ").strip()
+        if choice in ['1', '2', '3']:
+            break
+        print("Invalid choice. Please enter 1, 2, or 3.")
+
     # Process grayscale images with Tesseract + AI correction
-    print("Starting Tesseract + Correction processing for grayscale images...")
-    for image_file in grayscale_images:
-        image_path = resolve_image_path(PROCESSED_IMGS_GS_DIR, image_file)
-        if not image_path:
-            print(f"❌ Could not find grayscale image with any common extension: {image_file}")
-            continue
-        try:
-            # Perform OCR using Tesseract
-            ocr_text = pytesseract.image_to_string(Image.open(image_path), config="--psm 3")
-            print(f"OCR Text: {ocr_text[:100]}...")  # Show a snippet of the OCR text
+    if choice in ['1', '3']:
+        print("\n=== Starting Tesseract + Correction processing for grayscale images ===")
+        for image_file in grayscale_images:
+            image_path = resolve_image_path(PROCESSED_IMGS_GS_DIR, image_file)
+            if not image_path:
+                print(f"❌ Could not find grayscale image with any common extension: {image_file}")
+                continue
+            try:
+                # Perform OCR using Tesseract
+                print(f"\nProcessing: {image_file}")
+                ocr_text = pytesseract.image_to_string(Image.open(image_path), config="--psm 3")
+                print(f"OCR Text: {ocr_text[:100]}...")  # Show a snippet of the OCR text
 
-            # Correct the text using OpenAI (new SDK interface)
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are an expert at correcting OCR text from historical documents."},
-                    {"role": "user", "content": create_correction_prompt(ocr_text)}
-                ],
-                max_tokens=3000,
-                temperature=0.1
-            )
-            corrected_text = response.choices[0].message.content.strip()
+                # Correct the text using OpenAI (new SDK interface)
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": "You are an expert at correcting OCR text from historical documents."},
+                        {"role": "user", "content": create_correction_prompt(ocr_text)}
+                    ],
+                    max_tokens=3000,
+                    temperature=0.1
+                )
+                corrected_text = response.choices[0].message.content.strip()
 
-            # Save the corrected text to a .txt file
-            output_file = os.path.join(RESULTS_TESS_CORRECTION_DIR, f"{Path(image_file).stem}_corrected.txt")
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(corrected_text)
-            print(f"Saved corrected text to: {output_file}")
-        except Exception as e:
-            print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
+                # Save the corrected text to a .txt file
+                output_file = os.path.join(RESULTS_TESS_CORRECTION_DIR, f"{Path(image_file).stem}_corrected.txt")
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(corrected_text)
+                print(f"✅ Saved corrected text to: {output_file}")
+            except Exception as e:
+                print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
 
     # Process color images with OpenAI Vision
-    print("Starting OpenAI Vision processing for color images...")
-    for image_file in color_images:
-        image_path = resolve_image_path(PROCESSED_IMGS_DIR, image_file)
-        if not image_path:
-            print(f"❌ Could not find image with any common extension: {image_file}")
-            continue
-        transcribed_text, usage_info = transcribe_with_vision_api(image_path, api_key)
-        if transcribed_text:
-            # Save the transcribed text to a .txt file
-            output_file = os.path.join(RESULTS_VISION_DIR, f"{Path(image_file).stem}_vision.txt")
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(transcribed_text)
-            print(f"Saved Vision OCR text to: {output_file}")
+    if choice in ['2', '3']:
+        print("\n=== Starting OpenAI Vision processing for color images ===")
+        for image_file in color_images:
+            image_path = resolve_image_path(PROCESSED_IMGS_DIR, image_file)
+            if not image_path:
+                print(f"❌ Could not find image with any common extension: {image_file}")
+                continue
+            
+            print(f"\nProcessing: {image_file}")
+            transcribed_text, usage_info = transcribe_with_vision_api(image_path, api_key)
+            if transcribed_text:
+                # Save the transcribed text to a .txt file
+                output_file = os.path.join(RESULTS_VISION_DIR, f"{Path(image_file).stem}_vision.txt")
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(transcribed_text)
+                print(f"✅ Saved Vision OCR text to: {output_file}")
+
+    print("\n=== Processing Complete ===")
 
 
 if __name__ == "__main__":
