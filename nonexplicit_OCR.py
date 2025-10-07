@@ -98,7 +98,7 @@ def transcribe_with_vision_api(image_path, api_key):
 
         # Send request to OpenAI Vision API using the correct format
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5-mini",
             messages=[
                 {
                     "role": "system",
@@ -145,8 +145,7 @@ Transcribe now:"""
                     ]
                 }
             ],
-            max_tokens=4000,
-            temperature=0.0  # Set to 0 for maximum consistency and minimal creativity
+            max_completion_tokens=4000,
         )
 
         # Extract usage information
