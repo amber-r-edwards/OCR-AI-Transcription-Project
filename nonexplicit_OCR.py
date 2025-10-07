@@ -109,30 +109,32 @@ def transcribe_with_vision_api(image_path, api_key):
                     "content": [
                         {
                             "type": "text",
-                            "text": """Transcribe ALL text visible in this image with complete accuracy. Follow these rules strictly:
+                            "text": """TRANSCRIPTION TASK - Read this carefully:
 
-CRITICAL RULES:
-1. Transcribe ONLY what you see - do not invent, assume, or fill in missing text
-2. If text is unclear or illegible, use [illegible] or [unclear] markers
-3. Do not add interpretations, corrections, or modernizations
-4. Do not repeat or duplicate any text
-5. If you're uncertain about a word, transcribe your best guess followed by [?]
+YOUR ONLY TASK: Copy the visible text exactly as it appears.
 
-FORMATTING REQUIREMENTS:
-- Preserve exact layout, line breaks, and paragraph structure
-- Maintain original spelling, punctuation, and capitalization (including errors)
-- Include ALL headers, titles, dates, page numbers, and marginal notes
-- Preserve column structure if present
-- Indicate special formatting: *bold*, _italic_, ALL CAPS as shown
+STRICT RULES (Breaking these is an error):
+1. DO NOT add any text that is not visible in the image
+2. DO NOT explain what you see
+3. DO NOT summarize or paraphrase
+4. DO NOT fix spelling or grammar errors
+5. DO NOT complete partial words or sentences
+6. DO NOT add punctuation that isn't there
+7. If you cannot read something clearly, write [illegible] - DO NOT guess
 
-STRUCTURE:
-- Start each distinct section with a blank line
-- Preserve indentation where visible
-- Note any handwritten annotations as [handwritten: text]
-- Indicate images, graphics, or non-text elements as [IMAGE: brief description]
+WHAT TO INCLUDE:
+- Every word, letter, and number you can see
+- Original line breaks and spacing
+- Original spelling (even if wrong)
+- Headers, titles, dates, page numbers
+- Handwritten notes (mark as [handwritten: text])
 
-Begin transcription below:
----"""
+FORMAT:
+Start your response immediately with the transcribed text.
+Do not write "Here is the transcription:" or similar phrases.
+Do not add explanations before or after the transcription.
+
+Transcribe now:"""
                         },
                         {
                             "type": "image_url",
