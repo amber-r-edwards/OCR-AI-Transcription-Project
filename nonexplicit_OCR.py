@@ -105,7 +105,7 @@ def transcribe_with_vision_api(image_path, api_key):
                     "content": [
                         {
                             "type": "text",
-                            "text": "Please transcribe all visible text from this image. Preserve layout, line breaks, and original spelling. Do not translate or interpret."
+                            "text": "Please transcribe all text from this image. Preserve layout, line breaks, and original spelling. Do not translate or interpret. Transcribe the text exactly as is on the page."
                         },
                         {
                             "type": "image_url",
