@@ -230,6 +230,45 @@ def main():
             break
         print("Invalid choice. Please enter 1, 2, or 3.")
 
+    # Determine which images to show based on method choice
+    if choice == '1':
+        available_images = grayscale_images
+        image_type = "grayscale"
+    elif choice == '2':
+        available_images = color_images
+        image_type = "color"
+    else:  # choice == '3'
+        # For both methods, combine both lists (remove duplicates)
+        available_images = list(set(grayscale_images + color_images))
+        image_type = "all"
+
+    # Ask user which images to process
+    print(f"\n=== Select Images to Process ({image_type}) ===")
+    print("0. Process ALL images")
+    for idx, img in enumerate(available_images, 1):
+        print(f"{idx}. {img}")
+    
+    while True:
+        image_choice = input("\nEnter image number(s) (comma-separated, or 0 for all): ").strip()
+        try:
+            # Parse the input
+            if image_choice == '0':
+                selected_images = available_images
+                break
+            else:
+                # Split by comma and convert to integers
+                indices = [int(x.strip()) for x in image_choice.split(',')]
+                # Validate indices
+                if all(1 <= idx <= len(available_images) for idx in indices):
+                    selected_images = [available_images[idx - 1] for idx in indices]
+                    break
+                else:
+                    print(f"Invalid selection. Please enter numbers between 1 and {len(available_images)}, or 0 for all.")
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by commas.")
+
+    print(f"\n✅ Selected {len(selected_images)} image(s) for processing")
+
     # Process grayscale images with Tesseract + AI correction
     if choice in ['1', '3']:
         print("\n=== Starting Tesseract + Correction processing for grayscale images ===")
