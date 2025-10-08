@@ -60,7 +60,7 @@ def resize_and_convert_to_jpeg(image_path, max_width=1024, max_height=1024):
         img.thumbnail((max_width, max_height))  # Resize while maintaining aspect ratio
         jpeg_path = image_path.replace(".png", ".jpg")  # Save as JPEG
         img = img.convert("RGB")  # Ensure compatibility with JPEG
-        img.save(jpeg_path, "JPEG", quality=85)  # Adjust quality as needed
+        img.save(jpeg_path, "JPEG", quality=95)  # Adjust quality as needed
         return jpeg_path
 
 
@@ -318,12 +318,15 @@ def main():
             print(f"\nProcessing: {image_file}")
             transcribed_text, usage_info = transcribe_with_vision_api(image_path, api_key)
             if transcribed_text:
-                # Save the transcribed text to a .txt file
-                output_file = os.path.join(RESULTS_VISION_DIR, f"{Path(image_file).stem}_vision.txt")
-                with open(output_file, "w", encoding="utf-8") as f:
-                    f.write(transcribed_text)
-                print(f"✅ Saved Vision OCR text to: {output_file}")
 
+                try:
+                    # Save the transcribed text to a .txt file
+                    output_file = os.path.join(RESULTS_VISION_DIR, f"{Path(image_file).stem}_vision.txt")
+                    with open(output_file, "w", encoding="utf-8") as f:
+                        f.write(transcribed_text)
+                    print(f"✅ Saved Vision OCR text to: {output_file}")
+                except Exception as e:
+                    print(f"❌ Error processing {image_file} with Tesseract and AI: {e}")
     print("\n=== Processing Complete ===")
 
 
