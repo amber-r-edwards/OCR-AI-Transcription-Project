@@ -393,26 +393,3 @@ For questions or issues, please open a GitHub issue or email at are4@clemson.edu
 ---
 
 **Note**: This project is for educational and research purposes. Always respect copyright and obtain proper permissions before processing historical documents.
-```
-
-This README provides:
-- Clear project overview and structure
-- Complete setup instructions
-- Detailed usage guide
-- Troubleshooting section
-- Best practices
-- Copyright and legal considerations
-- Information about the `.gitignore` for sensitive materials
-
-The README is formatted for GitHub and includes emojis for better readability. It's comprehensive enough for someone to understand and reproduce your work while respecting copyright restrictions.
-This README provides:
-- Clear project overview and structure
-- Complete setup instructions
-- Detailed usage guide
-- Troubleshooting section
-- Best practices
-- Copyright and legal considerations
-- Information about the `.gitignore` for sensitive materials
-
-The README is formatted for GitHub and includes emojis for better readability. It's comprehensive enough for someone to understand and reproduce your work while respecting copyright restrictions.
-```
