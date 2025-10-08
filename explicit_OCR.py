@@ -145,7 +145,6 @@ STRICT RULES (Breaking these is an error):
 4. DO NOT fix spelling or grammar errors
 5. DO NOT complete partial words or sentences
 6. DO NOT add punctuation that isn't there
-7. If you cannot read something clearly, write [illegible] - DO NOT guess
 
 WHAT TO INCLUDE:
 - Every word, letter, and number you can see
@@ -326,14 +325,6 @@ def main():
                 print(f"✅ Saved Vision OCR text to: {output_file}")
 
     print("\n=== Processing Complete ===")
-
-
-if __name__ == "__main__":
-    main()
-
-
-if __name__ == "__main__":
-    main()
 
 
 if __name__ == "__main__":
