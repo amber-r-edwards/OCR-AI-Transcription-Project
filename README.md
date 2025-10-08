@@ -112,19 +112,6 @@ Use the `pdf_to_images.py` script to extract and process pages from PDF document
 ```bash
 python pdf_to_images.py
 ```
-**How it works:**
-Here's the updated section with the new step added:
-
-```markdown
-
-
-### 2. Convert PDFs to Images
-
-Use the `pdf_to_images.py` script to extract and process pages from PDF documents:
-
-```bash
-python pdf_to_images.py
-```
 
 **How it works:**
 1. The script prompts you to select a PDF file from your system
