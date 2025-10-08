@@ -60,7 +60,7 @@ def resize_and_convert_to_jpeg(image_path, max_width=1024, max_height=1024):
         img.thumbnail((max_width, max_height))  # Resize while maintaining aspect ratio
         jpeg_path = image_path.replace(".png", ".jpg")  # Save as JPEG
         img = img.convert("RGB")  # Ensure compatibility with JPEG
-        img.save(jpeg_path, "JPEG", quality=95)  # Adjust quality as needed
+        img.save(jpeg_path, "JPEG", quality=90)  # Adjust quality as needed
         return jpeg_path
 
 
@@ -169,7 +169,7 @@ Transcribe now:"""
                     ]
                 }
             ],
-            max_completion_tokens=4000,
+            max_completion_tokens=6000,
         )
 
         # Extract usage information
