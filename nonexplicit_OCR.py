@@ -147,7 +147,6 @@ STRICT RULES (Breaking these is an error):
 4. DO NOT fix spelling or grammar errors
 5. DO NOT complete partial words or sentences
 6. DO NOT add punctuation that isn't there
-7. If you cannot read something clearly, write [illegible] - DO NOT guess
 
 WHAT TO INCLUDE:
 - Every word, letter, and number you can see
@@ -161,8 +160,7 @@ Start your response immediately with the transcribed text.
 Do not write "Here is the transcription:" or similar phrases.
 Do not add explanations before or after the transcription.
 
-Transcribe now:"""
-                        },
+Transcribe now:"""      },
                         {
                             "type": "image_url",
                             "image_url": {

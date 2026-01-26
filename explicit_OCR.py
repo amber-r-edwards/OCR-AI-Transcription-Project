@@ -123,7 +123,7 @@ def transcribe_with_vision_api(image_path, api_key):
 
         # Send request to OpenAI Vision API using the responses endpoint
         response = client.chat.completions.create(
-            model="gpt-5-mini",
+            model="gpt-4.1",
             messages=[
                 {
                     "role": "system",
