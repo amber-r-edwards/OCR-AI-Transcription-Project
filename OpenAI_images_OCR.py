@@ -7,7 +7,6 @@ import base64
 
 
 # Define directories
-PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
 PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
 RESULTS_VISION_DIR = "results/OpenAI"  # Directory for Tesseract + OpenAI correction results
 
