@@ -11,11 +11,6 @@ PROCESSED_IMGS_GS_DIR = "processed_imgs_gs/"  # Directory for grayscale images
 PROCESSED_IMGS_DIR = "processed_imgs/"  # Directory for color images
 RESULTS_VISION_DIR = "results/OpenAI"  # Directory for Tesseract + OpenAI correction results
 
-# Define the images for explicit content processing
-grayscale_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003C.png", "HaightVol2No3_page_006C.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your grayscale image file names
-color_images = ["BabeVol1No17_page_015.png", "HaightVol2No3_page_003.png", "HaightVol2No3_page_006.png", "OOBVol1No1_page_013.png", "OOBVol1No4_page_013.png"]  # Replace with your color image file names
-
-
 def create_correction_prompt(ocr_text, document_type="historical document"):
     """
     Create a prompt for OpenAI to correct OCR text.
